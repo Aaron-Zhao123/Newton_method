@@ -1,0 +1,45 @@
+`timescale 1ns/1ps  
+module testbench_test_handshake();
+
+reg[1:0] x_value,b_value,numerator,;
+
+
+ Newton_method(
+x_value,
+clk,
+product_one,
+In_vd_mul_one,
+Out_rd_mul_one,
+In_rd_mul_one,
+Out_vd_mul_one
+);
+reg clk;
+reg[1:0] x_value;
+wire[1:0] product_one;
+reg In_vd_mul_one,Out_rd_mul_one;
+//In_vd_mul_one is always 1
+
+
+wire In_rd_mul_one,Out_vd_mul_one;
+
+//
+initial begin
+  data_in_file_mul=$fopen("H:/UROP research/verilog/src_newton/x_value.txt","r");
+  In_vd_mul_one<=1'b1;
+  Out_rd_mul_one<=1'b1;
+end
+initial begin
+	clk=0;
+	x_value=2'b0;	
+	while(1) begin
+		#10 clk=~clk;
+  end
+end
+
+always@(posedge) begin
+	if(In_vd_mul_one==1'b1&&In_rd_mul_one==1'b1) begin
+		scan_file_mul=$fscanf(data_in_file_mul,"%b",x_value);
+	end
+end
+
+endmodule

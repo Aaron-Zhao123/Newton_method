@@ -1,0 +1,13 @@
+module subtraction(clk,write_enable,x,y,res);
+
+input clk;
+input[1:0] x,y;
+input write_enable;
+output[1:0] res;
+
+wire[1:0] inverted_y;
+assign inverted_y=~y;
+
+On_line_adder adder(clk,write_enable,x,inverted_y,res);
+
+endmodule

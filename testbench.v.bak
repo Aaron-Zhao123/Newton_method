@@ -1,0 +1,94 @@
+`timescale 1ns/1ps  
+module testbench();
+
+reg clk;
+reg[8:0] cnt;
+reg[1:0] product_x,product_y,numerator,divisor;
+wire[6:0] computation_cycle_mul,computation_cycle_div;
+wire[8:0] cnt_mul,cnt_div;
+
+wire[1:0] p,q_value;
+wire read_indicator_mul,read_indicator_div;
+wire[1:0] STATE,STATE_div;
+wire fixing;
+reg write_enable_mul,write_enable_div;
+//wire[8:0] z_plus_dis,z_minus_dis;
+integer data_in_file_mul;
+integer scan_file_mul;
+integer data_out_file_mul;
+integer data_in_file_div;
+integer scan_file_div;
+integer data_out_file_div;
+Newton_method trial(
+product_x,
+product_y,
+numerator,
+divisor,
+clk,
+p,
+q_value,
+read_indicator_mul,
+read_indicator_div,
+STATE,
+STATE_div,
+write_enable_mul,
+write_enable_div,
+computation_cycle_mul,
+computation_cycle_div,
+cnt_mul,
+cnt_div,
+fixing
+);
+
+initial begin
+	clk=0;
+	product_x=2'b0;
+	product_y=2'b0;
+	write_enable_mul=1'b1;
+	write_enable_div=1'b1;
+	cnt=9'b0;
+	
+	while(1) begin
+		#10 clk=~clk;
+		cnt=cnt+1;
+		/*if(cnt<=9'b1111) begin
+		  write_enable=1'b1;  
+		end
+		else begin
+		  write_enable=1'b0;
+		end
+		*/
+  end
+end
+// clock module, 50Mhz clk
+
+
+
+initial begin
+  data_in_file_mul=$fopen("H:/UROP research/verilog/Online_multiplier_arbitary_precision_new/input.txt","r");
+  data_out_file_mul=$fopen("H:/UROP research/verilog/Newton_method/output_mul.dat","w");
+  data_in_file_div=$fopen("H:/UROP research/verilog/Online_divider_arbitary_precision/sample.txt","r");
+  data_out_file_div=$fopen("H:/UROP research/verilog/Newton_method/output_div.dat","w");
+end
+
+always@(posedge clk) begin
+	if(read_indicator_mul)
+		scan_file_mul=$fscanf(data_in_file_mul,"%b %b",product_x,product_y);
+	 
+	if(STATE==2'b11||(STATE==2'b00&&cnt_mul!=9'b0000&&computation_cycle_mul!=7'b1))
+		$fwrite(data_out_file_mul,"%b\n",p);
+		
+	if(read_indicator_div)begin
+		scan_file_div=$fscanf(data_in_file,"%b %b",numerator,divisor);
+	end
+	if((STATE_div==2'b11&&fixing!=1'b1)||(STATE==2'b10&&(cnt_div==9'b100||cnt_div==9'b11))) begin
+		$fwrite(data_out_file_div,"%b\n",q_value);
+	//	$fwrite(cycle_num_out_file,"%d\n",cycle_num);
+	//	$fflush(cycle_num_out_file);
+	end
+		
+		
+		
+end
+
+endmodule
